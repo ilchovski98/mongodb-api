@@ -10,11 +10,18 @@ const app = express();
 const MongoClient = mongodb.MongoClient;
 const port  = process.env.PORT || 3000;
 
+console.log(`Node env: ${process.env.NODE_ENV}`);
+console.log(`App settings: ${app.get('env')}`);
+
+if (app.get('env') === 'development') {
+  console.log('Logger is enabled...');
+  app.use(logger);
+}
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(helmet());
-app.use(logger);
 
 // connect to our mongodb database
 let cashedClient = null;
