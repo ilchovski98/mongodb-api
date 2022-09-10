@@ -1,0 +1,69 @@
+// grab the packages we need
+const express = require('express');
+const mongodb = require('mongodb');
+require('dotenv').config();
+
+// configure out app
+const app = express();
+const MongoClient = mongodb.MongoClient;
+const port  = process.env.PORT || 3000;
+
+app.use(express.json());
+
+// connect to our mongodb database
+let cashedClient = null;
+let cashedDb = null;
+
+async function connectToDatabase() {
+  if (cashedDb) return cashedDb;
+
+  try {
+    const client = await MongoClient.connect(process.env.DATABASE_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+
+    const db = client.db('tweets');
+
+    cashedClient = client;
+    cashedDb = db;
+
+    return db
+  } catch (error) {
+    console.log(`Connection error: ${error}`);
+  }
+}
+
+// create out routes
+app.get('/', (req, res) => {
+  res.send('Hello World');
+});
+
+// create
+app.post('/tweets', async (req, res) => {
+  const db = await connectToDatabase();
+  const text = req.body.text;
+  const tweet = await db.collection('tweets').insertOne({ text });
+  res.send({tweet});
+})
+
+// read
+app.get('/tweets', async (req, res) => {
+  try {
+    const db = await connectToDatabase();
+    const tweets = await db.collection('tweets').find({}).toArray();
+
+    res.json({ tweets })
+  } catch (error) {
+    console.log(`Route error: ${error}`);
+  }
+})
+
+// update
+
+// delete
+
+// create the server
+app.listen(port, () => {
+  console.log('Our app is running on port ', port);
+})
