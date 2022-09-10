@@ -45,7 +45,7 @@ app.post('/tweets', async (req, res) => {
   const text = req.body.text;
   const tweet = await db.collection('tweets').insertOne({ text });
   res.send({tweet});
-})
+});
 
 // read
 app.get('/tweets', async (req, res) => {
@@ -57,11 +57,28 @@ app.get('/tweets', async (req, res) => {
   } catch (error) {
     console.log(`Route error: ${error}`);
   }
-})
+});
 
 // update
+app.put('/tweets:tweetId', async (req, res) => {
+  const tweetId = req.params.tweetId.replace(':', '');
+  const db = await connectToDatabase();
+  const text = req.body.text;
+  const tweet = await db
+    .collection('tweets')
+    .updateOne({ _id: mongodb.ObjectId(tweetId) }, { $set: { text }});
+  res.send({tweet});
+});
 
 // delete
+app.delete('/tweets:tweetId', async (req, res) => {
+  const tweetId = req.params.tweetId.replace(':', '');
+  const db = await connectToDatabase();
+  const tweet = await db
+    .collection('tweets')
+    .deleteOne({ _id: mongodb.ObjectId(tweetId) });
+  res.send({tweet});
+});
 
 // create the server
 app.listen(port, () => {
