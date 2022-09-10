@@ -1,6 +1,8 @@
 // grab the packages we need
 const express = require('express');
 const mongodb = require('mongodb');
+const helmet = require('helmet');
+const logger = require('./middlewares/logger');
 require('dotenv').config();
 
 // configure out app
@@ -9,6 +11,10 @@ const MongoClient = mongodb.MongoClient;
 const port  = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
+app.use(helmet());
+app.use(logger);
 
 // connect to our mongodb database
 let cashedClient = null;
