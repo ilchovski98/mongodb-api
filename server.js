@@ -7,7 +7,7 @@ require('dotenv').config();
 
 // configure out app
 const app = express();
-const port  = process.env.PORT || 3000;
+const port  = process.env.PORT || 8000;
 
 // connect to our mongodb database
 connectToDatabase();
