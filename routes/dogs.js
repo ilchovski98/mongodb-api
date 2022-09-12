@@ -2,6 +2,35 @@ const express = require('express');
 const router = express.Router();
 const { connectToDatabase, mongodb } = require('../db/db');
 
+// eq (equal)
+// ne (not equal)
+// gt (greater than)
+// gte (greater than ot equal to)
+// lt (less than)
+// lte  (less than or equal to)
+// in
+// nin (not in)
+
+// Starts with Mosh
+// .find({ owner: /^Mosh/ })
+
+// Ends with Mosh
+// .find({ owner: /Mosh$/i })
+
+// Contains with Mosh
+// i makes the expression case insensitive
+// .find({ owner: /.*Mosh.*/i })
+
+router.get('/custom-search', async (req, res) => {
+  try {
+    const db = await connectToDatabase();
+    const dog = await db.collection('dogs').find({ name: { $in: ['Roki', 'Test']}}).toArray();
+    res.send({dog});
+  } catch (error) {
+    console.log(`Failed search: ${error}`);
+  }
+});
+
 // create
 router.post('/', async (req, res) => {
   const db = await connectToDatabase();
