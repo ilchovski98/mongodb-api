@@ -1,31 +1,11 @@
-const mongodb = require('mongodb');
-const MongoClient = mongodb.MongoClient;
+const mongoose = require('mongoose');
+require('dotenv').config({ path: __dirname + '/../.env' });
 
-let cashedClient = null;
-let cashedDb = null;
+main().catch(err => console.log(err));
 
-async function connectToDatabase() {
-  if (cashedDb) return cashedDb;
-
-  try {
-    const client = await MongoClient.connect(process.env.DATABASE_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
-
-    const db = client.db('tweets');
-
-    cashedClient = client;
-    cashedDb = db;
-
-    return db
-  } catch (error) {
-    console.log(`Connection error: ${error}`);
-  }
+async function main() {
+  await mongoose.connect(process.env.DATABASE_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  });
 }
-
-module.exports = {
-  connectToDatabase: connectToDatabase,
-  mongodb: mongodb,
-  MongoClient: MongoClient
-};

@@ -1,5 +1,5 @@
 const express = require('express');
-const { connectToDatabase } = require('./db/db');
+require('./db/db');
 const tweets = require('./routes/tweets');
 const dogs = require('./routes/dogs');
 const helmet = require('helmet');
@@ -8,9 +8,6 @@ require('dotenv').config();
 // configure out app
 const app = express();
 const port  = process.env.PORT || 8000;
-
-// connect to our mongodb database
-connectToDatabase();
 
 // Middlewares
 app.use(express.json());

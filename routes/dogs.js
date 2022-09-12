@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { connectToDatabase, mongodb } = require('../db/db');
+const dogModel = require('../models/dog');
 
 // eq (equal)
 // ne (not equal)
@@ -11,68 +11,65 @@ const { connectToDatabase, mongodb } = require('../db/db');
 // in
 // nin (not in)
 
-// Starts with Mosh
-// .find({ owner: /^Mosh/ })
-
-// Ends with Mosh
-// .find({ owner: /Mosh$/i })
-
-// Contains with Mosh
-// i makes the expression case insensitive
-// .find({ owner: /.*Mosh.*/i })
-
 router.get('/custom-search', async (req, res) => {
   try {
-    const db = await connectToDatabase();
-    const dog = await db.collection('dogs').find({ name: { $in: ['Roki', 'Test']}}).toArray();
-    res.send({dog});
+    const dog = await dogModel.find({ name: { $in: ['Roki', 'Test']}});
+    res.send(dog);
   } catch (error) {
-    console.log(`Failed search: ${error}`);
+    res.status(500).send(error);
   }
 });
 
 // create
 router.post('/', async (req, res) => {
-  const db = await connectToDatabase();
-  const dog = await db.collection('dogs').insertOne({
+  const dog = new dogModel({
     name: req.body.name,
     breed: req.body.breed,
     owner: req.body.owner
   });
-  res.send({dog});
+
+  try {
+    // send to database
+    await dog.save();
+    // send the data back as response
+    res.send(dog);
+  } catch (error) {
+    res.status(500).send(error);
+  }
 });
 
 // read
 router.get('/', async (req, res) => {
   try {
-    const db = await connectToDatabase();
-    const dogs = await db.collection('dogs').find({}).toArray();
+    const dogs = await dogModel.find({});
 
-    res.json({ dogs })
+    res.send(dogs);
   } catch (error) {
-    console.log(`Route error: ${error}`);
+    res.status(500).send(error);
   }
 });
 
 // update
 router.put('/:dogId', async (req, res) => {
-  const dogId = req.params.dogId.replace(':', '');
-  const db = await connectToDatabase();
-  const dog = await db
-    .collection('dogs')
-    .updateOne({ _id: mongodb.ObjectId(dogId) }, { $set: { ...req.body }});
-  res.send({dog});
+  try {
+    const dog = await dogModel.findByIdAndUpdate(req.params.dogId, req.body);
+    dog.save();
+    res.send(dog);
+  } catch (error) {
+    res.status(500).send(error);
+  }
 });
 
 // delete
 router.delete('/:dogId', async (req, res) => {
-  const dogId = req.params.dogId.replace(':', '');
-  console.log('req.params.dogId', req.params.dogId);
-  const db = await connectToDatabase();
-  const dog = await db
-    .collection('dogs')
-    .deleteOne({ _id: mongodb.ObjectId(dogId) });
-  res.send({dog});
+  try {
+    const dog = await dogModel.findByIdAndDelete(req.params.dogId);
+
+    if (!dog) res.status(404).send("No item found");
+    res.status(200).send();
+  } catch (error) {
+    res.status(500).send(error);
+  }
 });
 
 module.exports = router;
