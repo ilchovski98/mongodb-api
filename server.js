@@ -2,6 +2,7 @@ const express = require('express');
 require('./db/db');
 const tweets = require('./routes/tweets');
 const dogs = require('./routes/dogs');
+const users = require('./routes/users');
 const helmet = require('helmet');
 require('dotenv').config();
 
@@ -23,6 +24,7 @@ app.get('/', (req, res) => {
 // Routes
 app.use('/api/tweets', tweets);
 app.use('/api/dogs', dogs);
+app.use('/api/users', users);
 
 // create the server
 app.listen(port, () => {
