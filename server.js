@@ -7,6 +7,11 @@ const auth = require('./routes/auth');
 const helmet = require('helmet');
 require('dotenv').config();
 
+if (!process.env.JWTPRIVATEKEY) {
+  console.error('FATAL ERROR: jwtPrivateKey is not defined.');
+  process.exit(1);
+}
+
 // configure out app
 const app = express();
 const port  = process.env.PORT || 8000;
