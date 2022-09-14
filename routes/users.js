@@ -1,8 +1,30 @@
+const auth = require('../middlewares/auth');
 const _ = require('lodash');
 const bcrypt = require('bcrypt');
 const express = require('express');
 const router = express.Router();
 const { User, validate } = require('../models/user');
+
+router.get('/me', auth, async (req, res) => {
+  try {
+    const result = await User.findOne({ _id: req.user._id }).select('-password');
+
+    res.send(result);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+// read
+router.get('/', async (req, res) => {
+  try {
+    const users = await User.find({});
+
+    res.send(users);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 
 // create
 router.post('/', async (req, res) => {
@@ -21,17 +43,6 @@ router.post('/', async (req, res) => {
 
   const result = await user.save();
   res.header('x-auth-token', token).send(_.pick(result, ['name', 'email']));
-});
-
-// read
-router.get('/', async (req, res) => {
-  try {
-    const users = await User.find({});
-
-    res.send(users);
-  } catch (error) {
-    res.status(500).send(error);
-  }
 });
 
 module.exports = router;
