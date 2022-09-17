@@ -1,9 +1,10 @@
+const auth = require('../middlewares/auth');
 const express = require('express');
 const router = express.Router();
 const tweetModel = require('../models/tweets');
 
 // create
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
   try {
     const tweet = await tweetModel(req.body);
 
@@ -26,7 +27,7 @@ router.get('/', async (req, res) => {
 });
 
 // update
-router.put('/:tweetId', async (req, res) => {
+router.put('/:tweetId', auth, async (req, res) => {
   try {
     const tweet = await tweetModel.findByIdAndUpdate(req.params.tweetId, { text: req.body.text });
     await tweet.save();
@@ -37,7 +38,7 @@ router.put('/:tweetId', async (req, res) => {
 });
 
 // delete
-router.delete('/:tweetId', async (req, res) => {
+router.delete('/:tweetId', auth, async (req, res) => {
   try {
     const tweet = await tweetModel.findByIdAndDelete(req.params.tweetId);
     tweet.save();

@@ -1,3 +1,5 @@
+const auth = require('../middlewares/auth');
+const admin = require('../middlewares/admin');
 const express = require('express');
 const router = express.Router();
 const dogModel = require('../models/dog');
@@ -21,7 +23,7 @@ router.get('/custom-search', async (req, res) => {
 });
 
 // create
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
   const dog = new dogModel({
     name: req.body.name,
     breed: req.body.breed,
@@ -50,7 +52,7 @@ router.get('/', async (req, res) => {
 });
 
 // update
-router.put('/:dogId', async (req, res) => {
+router.put('/:dogId', auth, async (req, res) => {
   try {
     const dog = await dogModel.findByIdAndUpdate(req.params.dogId, req.body);
     dog.save();
@@ -61,7 +63,7 @@ router.put('/:dogId', async (req, res) => {
 });
 
 // delete
-router.delete('/:dogId', async (req, res) => {
+router.delete('/:dogId', [auth, admin], async (req, res) => {
   try {
     const dog = await dogModel.findByIdAndDelete(req.params.dogId);
 
