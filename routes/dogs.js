@@ -1,4 +1,5 @@
 const auth = require('../middlewares/auth');
+const admin = require('../middlewares/admin');
 const express = require('express');
 const router = express.Router();
 const dogModel = require('../models/dog');
@@ -62,7 +63,7 @@ router.put('/:dogId', auth, async (req, res) => {
 });
 
 // delete
-router.delete('/:dogId', auth, async (req, res) => {
+router.delete('/:dogId', [auth, admin], async (req, res) => {
   try {
     const dog = await dogModel.findByIdAndDelete(req.params.dogId);
 
