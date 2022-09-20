@@ -1,5 +1,6 @@
 const express = require('express');
 require('./db/db');
+const error = require('./middlewares/error');
 const tweets = require('./routes/tweets');
 const dogs = require('./routes/dogs');
 const users = require('./routes/users');
@@ -32,6 +33,7 @@ app.use('/api/tweets', tweets);
 app.use('/api/dogs', dogs);
 app.use('/api/users', users);
 app.use('/api/auth', auth);
+app.use(error);
 
 // create the server
 app.listen(port, () => {

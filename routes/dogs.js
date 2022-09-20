@@ -1,5 +1,6 @@
 const auth = require('../middlewares/auth');
 const admin = require('../middlewares/admin');
+const { asyncMiddleware } = require('../middlewares/async');
 const express = require('express');
 const router = express.Router();
 const dogModel = require('../models/dog');
@@ -13,65 +14,43 @@ const dogModel = require('../models/dog');
 // in
 // nin (not in)
 
-router.get('/custom-search', async (req, res) => {
-  try {
-    const dog = await dogModel.find({ name: { $in: ['Roki', 'Test']}});
-    res.send(dog);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+router.get('/custom-search', asyncMiddleware(async (req, res) => {
+  const dog = await dogModel.find({ name: { $in: ['Roki', 'Test']}});
+  res.send(dog);
+}));
 
 // create
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, asyncMiddleware(async (req, res) => {
   const dog = new dogModel({
     name: req.body.name,
     breed: req.body.breed,
     owner: req.body.owner
   });
 
-  try {
-    // send to database
-    await dog.save();
-    // send the data back as response
-    res.send(dog);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+  // send to database
+  await dog.save();
+  // send the data back as response
+  res.send(dog);
+}));
 
 // read
-router.get('/', async (req, res) => {
-  try {
-    const dogs = await dogModel.find({});
-
-    res.send(dogs);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+router.get('/', asyncMiddleware(async (req, res) => {
+  const dogs = await dogModel.find({});
+  res.send(dogs);
+}));
 
 // update
-router.put('/:dogId', auth, async (req, res) => {
-  try {
-    const dog = await dogModel.findByIdAndUpdate(req.params.dogId, req.body);
-    dog.save();
-    res.send(dog);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+router.put('/:dogId', auth, asyncMiddleware(async (req, res) => {
+  const dog = await dogModel.findByIdAndUpdate(req.params.dogId, req.body);
+  dog.save();
+  res.send(dog);
+}));
 
 // delete
-router.delete('/:dogId', [auth, admin], async (req, res) => {
-  try {
-    const dog = await dogModel.findByIdAndDelete(req.params.dogId);
-
-    if (!dog) res.status(404).send("No item found");
-    res.status(200).send();
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+router.delete('/:dogId', [auth, admin], asyncMiddleware(async (req, res) => {
+  const dog = await dogModel.findByIdAndDelete(req.params.dogId);
+  if (!dog) res.status(404).send("No item found");
+  res.status(200).send();
+}));
 
 module.exports = router;
