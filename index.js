@@ -8,6 +8,7 @@ const port  = process.env.PORT || 8000;
 require('./startup/db')();
 require('./startup/config')();
 require('./startup/routes')(app);
+require('./startup/prod')(app);
 
 // Create the server
 app.listen(port, () => {

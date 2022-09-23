@@ -11,7 +11,6 @@ module.exports = function(app) {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(express.static('public'));
-  app.use(helmet());
 
   // create out routes
   app.get('/', (req, res) => {
